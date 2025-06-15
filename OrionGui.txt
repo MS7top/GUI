@@ -654,6 +654,9 @@ function OrionLib:MakeWindow(WindowConfig)
 	MakeDraggable(DragPoint, MainWindow)
 
 AddConnection(CloseBtn.MouseButton1Up, function()
+		if Input.KeyCode == Enum.KeyCode.RightShift and UIHidden then
+			MainWindow.Visible = true
+		end
     local TweenService = game:GetService("TweenService")
     local Players = game:GetService("Players")
     local Lighting = game:GetService("Lighting")
