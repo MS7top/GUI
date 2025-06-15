@@ -710,20 +710,20 @@ AddConnection(CloseBtn.MouseButton1Up, function()
         txt.Font = Enum.Font.FredokaOne
 
         local yesButton = Instance.new("TextButton", frame)
-        yesButton.Text = "اي"
+        yesButton.Text = "لا"
         yesButton.Size = UDim2.new(0.42, 0, 0, 30)
         yesButton.Position = UDim2.new(0.05, 0, 1, -35)
-        yesButton.BackgroundColor3 = Color3.fromRGB(220, 80, 80)
+        yesButton.BackgroundColor3 = Color3.fromRGB(65, 200, 100)
         yesButton.TextColor3 = Color3.new(1, 1, 1)
         yesButton.Font = Enum.Font.FredokaOne
         yesButton.TextScaled = true
         Instance.new("UICorner", yesButton)
 
         local noButton = Instance.new("TextButton", frame)
-        noButton.Text = "لا"
+        noButton.Text = "اي"
         noButton.Size = UDim2.new(0.42, 0, 0, 30)
         noButton.Position = UDim2.new(0.53, 0, 1, -35)
-        noButton.BackgroundColor3 = Color3.fromRGB(65, 200, 100)
+        noButton.BackgroundColor3 = Color3.fromRGB(220, 80, 80)
         noButton.TextColor3 = Color3.new(1, 1, 1)
         noButton.Font = Enum.Font.FredokaOne
         noButton.TextScaled = true
