@@ -1,5 +1,4 @@
--- ZM2 GUI Library - OrionLib Style Clone (Full Version + Sliders, Notifi, Minimize)
-local ZM2 = {} local Players = game:GetService("Players") local TweenService = game:GetService("TweenService") local UserInputService = game:GetService("UserInputService") local LocalPlayer = Players.LocalPlayer
+-- ZM2 GUI Library - Orion Style Full Version local ZM2 = {} local Players = game:GetService("Players") local TweenService = game:GetService("TweenService") local UserInputService = game:GetService("UserInputService") local LocalPlayer = Players.LocalPlayer
 
 function ZM2:MakeWindow(settings) local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui")) gui.Name = "ZM2" gui.ResetOnSpawn = false
 
@@ -76,6 +75,7 @@ content.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 Instance.new("UICorner", content)
 
 local pages, currentPage = {}, nil
+local firstTab = true
 
 local dragging, dragInput, dragStart, startPos
 titleBar.InputBegan:Connect(function(input)
@@ -123,7 +123,14 @@ function window:MakeTab(tabSettings)
         page.Visible = true
     end)
 
+    if firstTab then
+        currentPage = page
+        page.Visible = true
+        firstTab = false
+    end
+
     local tab = {}
+    tab.Button = tabBtn
 
     function tab:AddSection(titleText)
         local label = Instance.new("TextLabel", page)
@@ -213,7 +220,7 @@ function window:MakeTab(tabSettings)
         label.TextSize = 14
         label.TextXAlignment = Enum.TextXAlignment.Left
 
-        local slider = Instance.new("TextButton", holder)
+        local slider = Instance.new("TextBox", holder)
         slider.Size = UDim2.new(0.7, 0, 1, 0)
         slider.Position = UDim2.new(0.3, 0, 0, 0)
         slider.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -221,10 +228,13 @@ function window:MakeTab(tabSettings)
         slider.Font = Enum.Font.Gotham
         slider.TextColor3 = Color3.new(1, 1, 1)
         slider.TextSize = 14
-        slider.MouseButton1Click:Connect(function()
+        slider.ClearTextOnFocus = false
+        slider.FocusLost:Connect(function()
             local value = tonumber(slider.Text)
             if value then
-                pcall(sl.Callback, math.clamp(value, sl.MinValue, sl.MaxValue))
+                local clamped = math.clamp(value, sl.MinValue, sl.MaxValue)
+                pcall(sl.Callback, clamped)
+                slider.Text = tostring(clamped)
             end
         end)
     end
