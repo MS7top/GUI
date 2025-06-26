@@ -1,4 +1,4 @@
--- ZM2 GUI Library - OrionLib Style Clone (Full Version)
+-- ZM2 GUI Library - OrionLib Style Clone (Full Version + Sliders, Notifi, Minimize)
 local ZM2 = {} local Players = game:GetService("Players") local TweenService = game:GetService("TweenService") local UserInputService = game:GetService("UserInputService") local LocalPlayer = Players.LocalPlayer
 
 function ZM2:MakeWindow(settings) local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui")) gui.Name = "ZM2" gui.ResetOnSpawn = false
@@ -41,6 +41,25 @@ title.TextXAlignment = Enum.TextXAlignment.Left
 title.Font = Enum.Font.GothamBold
 title.TextSize = 20
 title.BackgroundTransparency = 1
+
+local minimize = Instance.new("TextButton", titleBar)
+minimize.Size = UDim2.new(0, 40, 0, 40)
+minimize.Position = UDim2.new(1, -45, 0, 0)
+minimize.Text = "-"
+minimize.TextColor3 = Color3.fromRGB(255, 0, 0)
+minimize.Font = Enum.Font.GothamBold
+minimize.TextSize = 20
+minimize.BackgroundTransparency = 1
+local minimized = false
+
+minimize.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    for _, v in pairs(main:GetChildren()) do
+        if v ~= titleBar then
+            v.Visible = not minimized
+        end
+    end
+end)
 
 local tabsHolder = Instance.new("Frame", main)
 tabsHolder.Size = UDim2.new(0, 140, 1, -40)
@@ -180,7 +199,57 @@ function window:MakeTab(tabSettings)
         end)
     end
 
+    function tab:AddSlider(sl)
+        local holder = Instance.new("Frame", page)
+        holder.Size = UDim2.new(1, -10, 0, 40)
+        holder.BackgroundTransparency = 1
+
+        local label = Instance.new("TextLabel", holder)
+        label.Size = UDim2.new(0.3, 0, 1, 0)
+        label.Text = sl.Name
+        label.BackgroundTransparency = 1
+        label.Font = Enum.Font.Gotham
+        label.TextColor3 = Color3.new(1, 1, 1)
+        label.TextSize = 14
+        label.TextXAlignment = Enum.TextXAlignment.Left
+
+        local slider = Instance.new("TextButton", holder)
+        slider.Size = UDim2.new(0.7, 0, 1, 0)
+        slider.Position = UDim2.new(0.3, 0, 0, 0)
+        slider.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        slider.Text = tostring(sl.Default or 0)
+        slider.Font = Enum.Font.Gotham
+        slider.TextColor3 = Color3.new(1, 1, 1)
+        slider.TextSize = 14
+        slider.MouseButton1Click:Connect(function()
+            local value = tonumber(slider.Text)
+            if value then
+                pcall(sl.Callback, math.clamp(value, sl.MinValue, sl.MaxValue))
+            end
+        end)
+    end
+
     return tab
+end
+
+function window:MakeNotifi(nf)
+    local note = Instance.new("TextLabel", gui)
+    note.Size = UDim2.new(0, 250, 0, 50)
+    note.Position = UDim2.new(1, -260, 1, -100)
+    note.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    note.TextColor3 = Color3.new(1, 1, 1)
+    note.Text = nf.Title .. "\n" .. nf.Text
+    note.TextWrapped = true
+    note.Font = Enum.Font.Gotham
+    note.TextSize = 14
+    note.ZIndex = 10
+    Instance.new("UICorner", note)
+    TweenService:Create(note, TweenInfo.new(0.5), {Position = UDim2.new(1, -260, 1, -150)}):Play()
+    task.delay(nf.Time or 3, function()
+        TweenService:Create(note, TweenInfo.new(0.5), {Position = UDim2.new(1, 10, 1, 0)}):Play()
+        task.wait(0.5)
+        note:Destroy()
+    end)
 end
 
 return window
