@@ -1,4 +1,5 @@
 -- ZM2 GUI Library - Orion Style Full Version
+
 local ZM2 = {} local Players = game:GetService("Players") local TweenService = game:GetService("TweenService") local UserInputService = game:GetService("UserInputService") local LocalPlayer = Players.LocalPlayer
 
 function ZM2:MakeWindow(settings) local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui")) gui.Name = "ZM2" gui.ResetOnSpawn = false
