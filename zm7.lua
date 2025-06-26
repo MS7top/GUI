@@ -1,84 +1,124 @@
--- ZM2 GUI Library by ChatGPT & User
-local ZM2 = {} local Players = game:GetService("Players") local TweenService = game:GetService("TweenService") local LocalPlayer = Players.LocalPlayer
+-- ZM2 GUI Library - OrionLib Style Clone (Full Version) local ZM2 = {} local Players = game:GetService("Players") local TweenService = game:GetService("TweenService") local UserInputService = game:GetService("UserInputService") local LocalPlayer = Players.LocalPlayer
 
-function ZM2:MakeWindow(settings) local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui")) gui.Name = "ZM2_GUI" gui.ResetOnSpawn = false
+function ZM2:MakeWindow(settings) local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui")) gui.Name = "ZM2" gui.ResetOnSpawn = false
 
--- Splash Screen like Orion
 local splash = Instance.new("TextLabel", gui)
 splash.Size = UDim2.new(1, 0, 1, 0)
 splash.BackgroundColor3 = Color3.new(0, 0, 0)
-splash.Text = settings.Hub.Animation or "مرحبًا"
+splash.Text = settings.Hub.Animation or "Welcome"
 splash.TextColor3 = Color3.fromRGB(255, 0, 0)
-splash.Font = Enum.Font.SourceSansBold
+splash.Font = Enum.Font.GothamBlack
 splash.TextScaled = true
 splash.ZIndex = 10
 
-task.delay(2, function()
+task.spawn(function()
+    TweenService:Create(splash, TweenInfo.new(1), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+    task.wait(2)
     splash:Destroy()
 end)
 
--- Main Frame
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 600, 0, 400)
-main.Position = UDim2.new(0.5, -300, 0.5, -200)
-main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-main.BorderSizePixel = 0
+main.Size = UDim2.new(0, 640, 0, 420)
+main.Position = UDim2.new(0.5, -320, 0.5, -210)
+main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+local corner = Instance.new("UICorner", main)
+corner.CornerRadius = UDim.new(0, 10)
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(255, 0, 0)
+stroke.Thickness = 2
 
-local uiCorner = Instance.new("UICorner", main)
-uiCorner.CornerRadius = UDim.new(0, 8)
+local titleBar = Instance.new("Frame", main)
+titleBar.Size = UDim2.new(1, 0, 0, 40)
+titleBar.BackgroundTransparency = 1
 
-local uiStroke = Instance.new("UIStroke", main)
-uiStroke.Thickness = 2
-uiStroke.Color = Color3.fromRGB(255, 0, 0)
-
-local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Text = settings.Hub.Title or "ZM2 GUI"
+local title = Instance.new("TextLabel", titleBar)
+title.Size = UDim2.new(1, -50, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.Text = settings.Hub.Title or "ZM2 Hub"
 title.TextColor3 = Color3.new(1, 1, 1)
-title.BackgroundTransparency = 1
+title.TextXAlignment = Enum.TextXAlignment.Left
 title.Font = Enum.Font.GothamBold
-title.TextSize = 24
+title.TextSize = 20
+title.BackgroundTransparency = 1
+
+local tabsHolder = Instance.new("Frame", main)
+tabsHolder.Size = UDim2.new(0, 140, 1, -40)
+tabsHolder.Position = UDim2.new(0, 0, 0, 40)
+tabsHolder.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Instance.new("UICorner", tabsHolder)
+local tabLayout = Instance.new("UIListLayout", tabsHolder)
+tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
 local content = Instance.new("Frame", main)
-content.Size = UDim2.new(1, -20, 1, -60)
-content.Position = UDim2.new(0, 10, 0, 50)
-content.BackgroundTransparency = 1
+content.Size = UDim2.new(1, -140, 1, -40)
+content.Position = UDim2.new(0, 140, 0, 40)
+content.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Instance.new("UICorner", content)
 
-local layout = Instance.new("UIListLayout", content)
-layout.Padding = UDim.new(0, 10)
-layout.SortOrder = Enum.SortOrder.LayoutOrder
+local pages, currentPage = {}, nil
+
+local dragging, dragInput, dragStart, startPos
+titleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = main.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
 
 local window = {}
 
 function window:MakeTab(tabSettings)
-    local tabFrame = Instance.new("Frame", content)
-    tabFrame.Size = UDim2.new(1, 0, 0, 300)
-    tabFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    local tabBtn = Instance.new("TextButton", tabsHolder)
+    tabBtn.Size = UDim2.new(1, 0, 0, 40)
+    tabBtn.Text = tabSettings.Name
+    tabBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tabBtn.TextColor3 = Color3.new(1, 1, 1)
+    tabBtn.Font = Enum.Font.Gotham
+    tabBtn.TextSize = 16
 
-    local corner = Instance.new("UICorner", tabFrame)
-    local stroke = Instance.new("UIStroke", tabFrame)
-    stroke.Color = Color3.fromRGB(255, 0, 0)
-
-    local layout = Instance.new("UIListLayout", tabFrame)
-    layout.Padding = UDim.new(0, 5)
+    local page = Instance.new("ScrollingFrame", content)
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.CanvasSize = UDim2.new(0, 0, 10, 0)
+    page.BackgroundTransparency = 1
+    page.ScrollBarThickness = 4
+    page.Visible = false
+    local layout = Instance.new("UIListLayout", page)
+    layout.Padding = UDim.new(0, 6)
     layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    tabBtn.MouseButton1Click:Connect(function()
+        if currentPage then currentPage.Visible = false end
+        currentPage = page
+        page.Visible = true
+    end)
 
     local tab = {}
 
     function tab:AddSection(titleText)
-        local label = Instance.new("TextLabel", tabFrame)
+        local label = Instance.new("TextLabel", page)
         label.Size = UDim2.new(1, -10, 0, 30)
         label.Text = titleText[1] or "قسم"
-        label.TextColor3 = Color3.new(1, 1, 1)
+        label.TextColor3 = Color3.fromRGB(255, 0, 0)
         label.BackgroundTransparency = 1
         label.Font = Enum.Font.GothamBold
         label.TextSize = 18
     end
 
     function tab:AddButton(btnSettings)
-        local btn = Instance.new("TextButton", tabFrame)
-        btn.Size = UDim2.new(1, -20, 0, 40)
-        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        local btn = Instance.new("TextButton", page)
+        btn.Size = UDim2.new(1, -10, 0, 40)
+        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
         btn.Text = btnSettings.Name or "زر"
         btn.TextColor3 = Color3.new(1, 1, 1)
         btn.Font = Enum.Font.Gotham
@@ -88,158 +128,58 @@ function window:MakeTab(tabSettings)
         end)
     end
 
-    function tab:AddToggle(tglSettings)
-        local frame = Instance.new("Frame", tabFrame)
-        frame.Size = UDim2.new(1, -20, 0, 40)
-        frame.BackgroundTransparency = 1
-
-        local toggle = Instance.new("TextButton", frame)
-        toggle.Size = UDim2.new(1, 0, 1, 0)
-        toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        toggle.TextColor3 = Color3.new(1, 1, 1)
+    function tab:AddToggle(tgl)
+        local toggle = Instance.new("TextButton", page)
+        toggle.Size = UDim2.new(1, -10, 0, 40)
+        toggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
         toggle.Font = Enum.Font.Gotham
         toggle.TextSize = 16
-
-        local state = tglSettings.Default or false
-        local function updateText()
-            toggle.Text = (state and "[تشغيل] " or "[ايقاف] ") .. (tglSettings.Name or "Toggle")
+        toggle.TextColor3 = Color3.new(1, 1, 1)
+        local state = tgl.Default or false
+        local function update()
+            toggle.Text = (state and "[تشغيل] " or "[ايقاف] ") .. (tgl.Name or "Toggle")
         end
-        updateText()
+        update()
         toggle.MouseButton1Click:Connect(function()
             state = not state
-            updateText()
-            pcall(tglSettings.Callback, state)
+            update()
+            pcall(tgl.Callback, state)
         end)
     end
 
-    function tab:AddTextBox(txtSettings)
-        local box = Instance.new("TextBox", tabFrame)
-        box.Size = UDim2.new(1, -20, 0, 40)
-        box.PlaceholderText = txtSettings.PlaceholderText or "اكتب هنا"
-        box.Text = txtSettings.Default or ""
+    function tab:AddTextBox(txt)
+        local box = Instance.new("TextBox", page)
+        box.Size = UDim2.new(1, -10, 0, 40)
+        box.PlaceholderText = txt.PlaceholderText or "اكتب هنا"
+        box.Text = txt.Default or ""
         box.TextColor3 = Color3.new(1, 1, 1)
-        box.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        box.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
         box.Font = Enum.Font.Gotham
         box.TextSize = 16
         box.FocusLost:Connect(function()
-            pcall(txtSettings.Callback, box.Text)
-            if txtSettings.ClearText then box.Text = "" end
+            pcall(txt.Callback, box.Text)
+            if txt.ClearText then box.Text = "" end
         end)
     end
 
-    function tab:AddDropdown(dropSettings)
-        local btn = Instance.new("TextButton", tabFrame)
-        btn.Size = UDim2.new(1, -20, 0, 40)
-        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        btn.Text = dropSettings.Default or dropSettings.Options[1]
-        btn.TextColor3 = Color3.new(1, 1, 1)
-        btn.Font = Enum.Font.Gotham
-        btn.TextSize = 16
-
-        btn.MouseButton1Click:Connect(function()
-            local next = table.find(dropSettings.Options, btn.Text) + 1
-            if next > #dropSettings.Options then next = 1 end
-            btn.Text = dropSettings.Options[next]
-            pcall(dropSettings.Callback, btn.Text)
-        end)
-    end
-
-    function tab:AddSlider(slSettings)
-        local sliderFrame = Instance.new("Frame", tabFrame)
-        sliderFrame.Size = UDim2.new(1, -20, 0, 40)
-        sliderFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        local label = Instance.new("TextLabel", sliderFrame)
-        label.Size = UDim2.new(1, 0, 1, 0)
-        label.Text = slSettings.Name .. ": " .. slSettings.Default
-        label.TextColor3 = Color3.new(1, 1, 1)
-        label.BackgroundTransparency = 1
-        label.Font = Enum.Font.Gotham
-        label.TextSize = 16
-        
-        local value = slSettings.Default
-        sliderFrame.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                local conn
-                conn = game:GetService("UserInputService").InputChanged:Connect(function(m)
-                    if m.UserInputType == Enum.UserInputType.MouseMovement then
-                        local x = math.clamp((m.Position.X - sliderFrame.AbsolutePosition.X) / sliderFrame.AbsoluteSize.X, 0, 1)
-                        value = math.floor((slSettings.MinValue + (slSettings.MaxValue - slSettings.MinValue) * x) / slSettings.Increase + 0.5) * slSettings.Increase
-                        label.Text = slSettings.Name .. ": " .. value
-                        pcall(slSettings.Callback, value)
-                    end
-                end)
-                input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then
-                        conn:Disconnect()
-                    end
-                end)
-            end
-        end)
-    end
-
-    function tab:AddColorPicker(cpSettings)
-        local btn = Instance.new("TextButton", tabFrame)
-        btn.Size = UDim2.new(1, -20, 0, 40)
-        btn.BackgroundColor3 = cpSettings.Default or Color3.fromRGB(255, 255, 0)
-        btn.Text = cpSettings.Name
-        btn.TextColor3 = Color3.new(0, 0, 0)
-        btn.Font = Enum.Font.Gotham
-        btn.TextSize = 16
-        btn.MouseButton1Click:Connect(function()
-            pcall(cpSettings.Callback, btn.BackgroundColor3)
-        end)
-    end
-
-    function tab:AddImageLabel(imgSettings)
-        local img = Instance.new("ImageLabel", tabFrame)
-        img.Size = UDim2.new(1, -20, 0, 120)
-        img.Image = imgSettings.Image or "rbxassetid://"
-        img.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    end
-
-    function tab:AddDiscord(disSettings)
-        local btn = Instance.new("TextButton", tabFrame)
-        btn.Size = UDim2.new(1, -20, 0, 40)
-        btn.BackgroundColor3 = Color3.fromRGB(114, 137, 218)
-        btn.Text = disSettings.DiscordTitle or "Join Discord"
+    function tab:AddDropdown(dd)
+        local btn = Instance.new("TextButton", page)
+        btn.Size = UDim2.new(1, -10, 0, 40)
+        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        btn.Text = dd.Default or dd.Options[1]
         btn.TextColor3 = Color3.new(1, 1, 1)
         btn.Font = Enum.Font.Gotham
         btn.TextSize = 16
         btn.MouseButton1Click:Connect(function()
-            setclipboard(disSettings.DiscordLink)
+            local i = table.find(dd.Options, btn.Text) or 1
+            i = i + 1
+            if i > #dd.Options then i = 1 end
+            btn.Text = dd.Options[i]
+            pcall(dd.Callback, btn.Text)
         end)
     end
 
     return tab
-end
-
-function window:MakeNotifi(notif)
-    local n = Instance.new("TextLabel", gui)
-    n.Size = UDim2.new(0, 300, 0, 50)
-    n.Position = UDim2.new(0.5, -150, 0.1, 0)
-    n.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    n.Text = notif.Title .. " - " .. notif.Text
-    n.TextColor3 = Color3.new(1, 1, 1)
-    n.Font = Enum.Font.Gotham
-    n.TextSize = 16
-    n.ZIndex = 5
-    game:GetService("Debris"):AddItem(n, notif.Time or 5)
-end
-
-function window:MinimizeButton(minSettings)
-    local btn = Instance.new("ImageButton", main)
-    btn.Size = UDim2.new(0, minSettings.Size[1], 0, minSettings.Size[2])
-    btn.Position = UDim2.new(1, -minSettings.Size[1] - 10, 0, 5)
-    btn.Image = minSettings.Image or ""
-    btn.BackgroundColor3 = minSettings.Color or Color3.fromRGB(10, 10, 10)
-    if minSettings.Corner then Instance.new("UICorner", btn) end
-    if minSettings.Stroke then
-        local s = Instance.new("UIStroke", btn)
-        s.Color = minSettings.StrokeColor or Color3.fromRGB(255, 0, 0)
-    end
-    btn.MouseButton1Click:Connect(function()
-        main.Visible = not main.Visible
-    end)
 end
 
 return window
