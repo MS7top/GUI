@@ -1581,13 +1581,13 @@ function redzlib:MakeWindow(Configs)
 	local Window, FirstTab = {}, false
 	function Window:CloseBtn()
 		local Dialog = Window:Dialog({
-			Title = "اشـعار!",
-			Text = "هـل تـريد غـلق سـكربت F2 ؟",
+			Title = "غلق السكربت",
+			Text = "هل تريد غلق السكربت حقاً ؟",
 			Options = {
-				{"أي", function()
+				{"<font color='rgb(250, 200, 0)'>اي</font>", function()
 					ScreenGui:Destroy()
 				end},
-				{"لا"}
+				{"<font color='rgb(0, 255, 60)'>لا</font>"}
 			}
 		})
 	end
