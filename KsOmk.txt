@@ -1584,10 +1584,10 @@ function redzlib:MakeWindow(Configs)
 			Title = "غلق السكربت",
 			Text = "هل تريد غلق السكربت حقاً ؟",
 			Options = {
-				{"<font color='rgb(250, 200, 0)'>اي</font>", function()
+				{"اي", function()
 					ScreenGui:Destroy()
 				end},
-				{"<font color='rgb(0, 255, 60)'>لا</font>"}
+				{"لا"}
 			}
 		})
 	end
